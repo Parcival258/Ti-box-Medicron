@@ -110,36 +110,44 @@ export function AppNavigation({
           </AppNavigationGroup>
 
           <AppNavigationGroup isCollapsed={isCollapsed} title="Administracion">
-              {canManageUsers && (
-                <AppNavigationButton
-                  icon="users"
-                  isCollapsed={isCollapsed}
-                  label="Usuarios"
-                  to={VIEW_PATHS.users}
-                />
-              )}
-              {canManageSystemLogs && (
-                <AppNavigationButton
-                  icon="logs"
-                  isCollapsed={isCollapsed}
-                  label="Logs del sistema"
-                  to={VIEW_PATHS.systemLogs}
-                />
-              )}
-              {canViewSettings && (
-                <AppNavigationButton
-                  icon="building"
-                  isCollapsed={isCollapsed}
-                  label="Sedes y Tipos"
-                  to={VIEW_PATHS.headquarters}
-                />
-              )}
+            {canManageUsers && (
               <AppNavigationButton
-                icon="settings"
+                icon="users"
                 isCollapsed={isCollapsed}
-                label="Configuracion"
-                to={VIEW_PATHS.settings}
+                label="Usuarios"
+                to={VIEW_PATHS.users}
               />
+            )}
+            {canManageSystemLogs && (
+              <AppNavigationButton
+                icon="logs"
+                isCollapsed={isCollapsed}
+                label="Logs del sistema"
+                to={VIEW_PATHS.systemLogs}
+              />
+            )}
+            {canViewSettings && (
+              <AppNavigationButton
+                icon="building"
+                isCollapsed={isCollapsed}
+                label="Sedes y Tipos"
+                to={VIEW_PATHS.headquarters}
+              />
+            )}
+            <AppNavigationButton
+              icon="settings"
+              isCollapsed={isCollapsed}
+              label="Configuracion"
+              to={VIEW_PATHS.settings}
+            />
+          </AppNavigationGroup>
+          <AppNavigationGroup isCollapsed={isCollapsed} title="Sistema">
+            <AppNavigationButton
+              icon="info"
+              isCollapsed={isCollapsed}
+              label="Info"
+              to={VIEW_PATHS.info}
+            />
           </AppNavigationGroup>
         </nav>
 

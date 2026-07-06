@@ -33,8 +33,12 @@ export function AppOverlays({ confirmation, workspace }: AppOverlaysProps) {
         equipment={state.equipment}
         equipmentCatalogs={state.equipmentCatalogs}
         equipmentGroups={state.equipmentGroups}
+        initialGroupId={state.scheduleFormGroupId}
         isOpen={state.isScheduleFormOpen}
-        onClose={() => actions.setIsScheduleFormOpen(false)}
+        onClose={() => {
+          actions.setIsScheduleFormOpen(false)
+          actions.setScheduleFormGroupId(null)
+        }}
         onSubmit={actions.handleCreateSchedule}
       />
       <ConfirmDialog

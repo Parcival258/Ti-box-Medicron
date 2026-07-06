@@ -9,6 +9,7 @@ export type ActiveView =
   | 'cases'
   | 'alerts'
   | 'chat'
+  | 'info'
 
 export type AuthState = 'checking' | 'authenticated' | 'guest' | 'submitting'
 export type LifeSheetState = 'idle' | 'loading' | 'ready' | 'error'

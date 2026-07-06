@@ -11,7 +11,7 @@ export function SocialLinks() {
       <p className="text-sm font-medium uppercase tracking-wide text-cyan-300">
         Redes
       </p>
-      <div className="mt-5 flex items-center gap-4">
+      <div className="mt-10 flex items-center gap-4">
         <SocialButton href={socialLinks.github} label="GitHub" variant="github">
           <svg
             xmlns="http://www.w3.org/2000/svg"

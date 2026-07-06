@@ -36,6 +36,7 @@ type WorkspaceResetDependencies = {
   setHeadquarters: (headquarters: Headquarter[]) => void
   setIsEquipmentFormOpen: (isOpen: boolean) => void
   setIsScheduleFormOpen: (isOpen: boolean) => void
+  setScheduleFormGroupId: (groupId: string | null) => void
   setLifeSheet: (lifeSheet: EquipmentLifeSheet | null) => void
   setLifeSheetStatus: (status: LifeSheetState) => void
   setLocations: (locations: Location[]) => void
@@ -68,6 +69,7 @@ export function createWorkspaceResetAction({
   setHeadquarters,
   setIsEquipmentFormOpen,
   setIsScheduleFormOpen,
+  setScheduleFormGroupId,
   setLifeSheet,
   setLifeSheetStatus,
   setLocations,
@@ -99,6 +101,7 @@ export function createWorkspaceResetAction({
     setEquipmentFormMode('create')
     setIsEquipmentFormOpen(false)
     setIsScheduleFormOpen(false)
+    setScheduleFormGroupId(null)
     setLifeSheet(null)
     setLifeSheetStatus('idle')
     setHeadquarters([])

@@ -67,9 +67,9 @@ export function useWorkspaceController({
   const { equipmentTypes, headquarters, locations, setEquipmentTypes, setHeadquarters, setLocations } =
     useSettingsState()
   const {
-    equipmentGroups, isScheduleFormOpen, maintenanceCatalogs, maintenanceFilters,
+    equipmentGroups, isScheduleFormOpen, scheduleFormGroupId, maintenanceCatalogs, maintenanceFilters,
     maintenanceRecords, maintenanceSchedules, maintenanceStatus, setEquipmentGroups,
-    setIsScheduleFormOpen, setMaintenanceCatalogs, setMaintenanceFilters,
+    setIsScheduleFormOpen, setScheduleFormGroupId, setMaintenanceCatalogs, setMaintenanceFilters,
     setMaintenanceRecords, setMaintenanceSchedules, setMaintenanceStatus,
   } = useMaintenanceState()
   const {
@@ -198,6 +198,7 @@ export function useWorkspaceController({
     setHeadquarters,
     setIsEquipmentFormOpen,
     setIsScheduleFormOpen,
+    setScheduleFormGroupId,
     setLifeSheet,
     setLifeSheetStatus,
     setLocations,
@@ -296,6 +297,7 @@ export function useWorkspaceController({
       setActiveView,
       setIsEquipmentFormOpen,
       setIsScheduleFormOpen,
+      setScheduleFormGroupId,
       setMaintenanceFilters,
       startMaintenanceSchedule,
       acknowledgeAlert,
@@ -336,6 +338,7 @@ export function useWorkspaceController({
       isEquipmentFormOpen,
       isRunningAlerts,
       isScheduleFormOpen,
+      scheduleFormGroupId,
       lifeSheet,
       lifeSheetStatus,
       maintenanceCatalogs,

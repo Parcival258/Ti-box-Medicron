@@ -1,3 +1,5 @@
+import medicronLogo from '../assets/logo-medicron.png'
+
 type LandingHeroProps = {
   onEnter: () => void
 }
@@ -6,8 +8,14 @@ export function LandingHero({ onEnter }: LandingHeroProps) {
   return (
     <section className="relative z-10 mx-auto flex min-h-screen w-full max-w-6xl flex-col justify-center px-5 py-16 sm:px-8">
       <p className="text-sm font-medium uppercase tracking-wide text-cyan-300">
-        TIBOX
+        TI-BOX RedMEdicron
       </p>
+      <img
+        className="mt-6 mb-2 h-auto"
+        src={medicronLogo}
+        alt="Red Medicron IPS"
+        style={{ width: 'clamp(120px, 16vw, 160px)' }}
+      />
       <h1 className="mt-4 max-w-3xl text-4xl font-semibold leading-tight text-white sm:text-6xl">
         Control simple para equipos, sedes y responsables.
       </h1>
@@ -27,7 +35,7 @@ export function LandingHero({ onEnter }: LandingHeroProps) {
       </div>
 
       <div className="mt-16 grid max-w-3xl gap-3 sm:grid-cols-3">
-        {['Equipos', 'Mantenimientos', 'Sedes'].map((item) => (
+        {['Equipos', 'Mantenimientos', 'Locaciones', 'Prestamos', 'Chat', 'Gestión de usuarios', 'Tikets'].map((item) => (
           <div key={item} className="border-t border-slate-700 pt-3 text-sm text-slate-300">
             {item}
           </div>

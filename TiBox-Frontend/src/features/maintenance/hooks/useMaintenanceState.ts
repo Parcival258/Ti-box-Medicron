@@ -16,9 +16,11 @@ export function useMaintenanceState() {
   const [maintenanceCatalogs, setMaintenanceCatalogs] = useState<MaintenanceScheduleCatalogs | null>(null)
   const [maintenanceStatus, setMaintenanceStatus] = useState<ModuleState>('loading')
   const [isScheduleFormOpen, setIsScheduleFormOpen] = useState(false)
+  const [scheduleFormGroupId, setScheduleFormGroupId] = useState<string | null>(null)
 
   return {
     isScheduleFormOpen,
+    scheduleFormGroupId,
     maintenanceCatalogs,
     equipmentGroups,
     maintenanceFilters,
@@ -27,6 +29,7 @@ export function useMaintenanceState() {
     maintenanceStatus,
     setEquipmentGroups,
     setIsScheduleFormOpen,
+    setScheduleFormGroupId,
     setMaintenanceCatalogs,
     setMaintenanceFilters,
     setMaintenanceRecords,

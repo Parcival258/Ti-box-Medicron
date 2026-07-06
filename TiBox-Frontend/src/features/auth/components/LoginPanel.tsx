@@ -10,8 +10,8 @@ type LoginPanelProps = {
 }
 
 export function LoginPanel({ isSubmitting, error, onSubmit }: LoginPanelProps) {
-  const [email, setEmail] = useState('admin@inventario.local')
-  const [password, setPassword] = useState('Admin12345')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -52,6 +52,7 @@ export function LoginPanel({ isSubmitting, error, onSubmit }: LoginPanelProps) {
           value={email}
           onChange={(event) => setEmail(event.target.value)}
           autoComplete="email"
+          placeholder="correo@empresa.com"
           required
         />
 
@@ -65,6 +66,7 @@ export function LoginPanel({ isSubmitting, error, onSubmit }: LoginPanelProps) {
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           autoComplete="current-password"
+          placeholder="Ingresa tu contrasena"
           required
         />
 

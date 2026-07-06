@@ -30,6 +30,7 @@ type MaintenanceScheduleFormModalProps = {
   equipment: Equipment[]
   equipmentCatalogs: EquipmentCatalogs | null
   equipmentGroups: EquipmentGroup[]
+  initialGroupId?: string | null
   isOpen: boolean
   onClose: () => void
   onSubmit: (payload: CreateMaintenanceSchedulePayload | CreateMaintenanceSchedulePayload[]) => Promise<void>
@@ -64,7 +65,7 @@ export function MaintenanceScheduleFormModal(props: MaintenanceScheduleFormModal
     return null
   }
 
-  return <MaintenanceScheduleFormContent {...props} key="maintenance-schedule-form" />
+  return <MaintenanceScheduleFormContent {...props} key={`maintenance-schedule-form-${props.initialGroupId ?? 'equipment'}`} />
 }
 
 function MaintenanceScheduleFormContent({
@@ -72,13 +73,14 @@ function MaintenanceScheduleFormContent({
   equipment,
   equipmentCatalogs,
   equipmentGroups,
+  initialGroupId,
   isOpen,
   onClose,
   onSubmit,
 }: MaintenanceScheduleFormModalProps) {
   const [form, setForm] = useState<MaintenanceScheduleFormState>(emptyMaintenanceScheduleForm)
-  const [scope, setScope] = useState<'equipment' | 'group'>('equipment')
-  const [groupId, setGroupId] = useState('')
+  const [scope, setScope] = useState<'equipment' | 'group'>(() => initialGroupId ? 'group' : 'equipment')
+  const [groupId, setGroupId] = useState(initialGroupId ?? '')
   const [submitState, setSubmitState] = useState<'idle' | 'submitting' | 'error'>('idle')
   const [errorMessage, setErrorMessage] = useState('')
 

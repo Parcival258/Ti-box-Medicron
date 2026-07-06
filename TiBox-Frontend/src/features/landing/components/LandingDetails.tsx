@@ -11,8 +11,8 @@ export function LandingDetails() {
           </p>
           <h2 className="mt-3 text-2xl font-semibold text-white">Canales de soporte</h2>
           <dl className="mt-6 grid gap-4 sm:grid-cols-2">
-            <InfoItem label="Correo" value="andreslasso250@gmail.com" />
-            <InfoItem label="Telefono" value="1234567890" />
+            <InfoItem label="Correo" value="andreslasso227@gmail.com" />
+            <InfoItem label="Telefono" value="3234553301" />
             <InfoItem label="Horario" value="24/7" />
             <InfoItem label="Ubicacion" value="Pasto/Narino" />
           </dl>
@@ -25,7 +25,7 @@ export function LandingDetails() {
           <dl className="mt-5 space-y-4">
             <InfoItem label="Responsable" value="Andres L." />
             <InfoItem label="Area" value="TI" />
-            <InfoItem label="Version" value="Beta 1.0.1" />
+            <InfoItem label="Version" value="V 1.0.0" />
           </dl>
         </div>
 

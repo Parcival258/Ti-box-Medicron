@@ -70,6 +70,7 @@ type MaintenancePageProps = {
   onCreateGroup: (payload: EquipmentGroupPayload) => Promise<void>
   onDeleteGroup: (groupId: string) => Promise<void>
   onCreateSchedule: () => void
+  onScheduleGroup: (groupId: string) => void
   onFinish: (schedule: MaintenanceSchedule, payload: StagePayload) => Promise<void>
   onMarkPending: (scheduleId: string) => void
   onReschedule: (scheduleId: string, scheduledFor: string) => void
@@ -110,6 +111,7 @@ export function MaintenancePage({
   onCreateGroup,
   onDeleteGroup,
   onCreateSchedule,
+  onScheduleGroup,
   onFinish,
   onMarkPending,
   onReschedule,
@@ -135,9 +137,16 @@ export function MaintenancePage({
     () => records.filter((record) => record.maintenanceType === activeType),
     [activeType, records]
   )
-  const processMetrics = useMemo(() => getProcessMetrics(visibleRecords), [visibleRecords])
+  const inboxRecords = useMemo(
+    () =>
+      filters.equipmentGroupId
+        ? latestRecordByEquipment(visibleRecords)
+        : visibleRecords,
+    [filters.equipmentGroupId, visibleRecords]
+  )
+  const processMetrics = useMemo(() => getProcessMetrics(inboxRecords), [inboxRecords])
   const selectedRecord =
-    visibleRecords.find((record) => record.id === selectedRecordId) ?? visibleRecords[0] ?? null
+    inboxRecords.find((record) => record.id === selectedRecordId) ?? inboxRecords[0] ?? null
 
   useEffect(() => {
     if (!selectedRecord && selectedRecordId) {
@@ -162,11 +171,11 @@ export function MaintenancePage({
   }, [selectedRecord])
 
   function updateFilters(changes: MaintenanceFilters) {
-    onChangeFilters({
+    onChangeFilters(cleanMaintenanceFilters({
       ...filters,
       ...changes,
       maintenanceType: activeType,
-    })
+    }))
   }
 
   return (
@@ -199,7 +208,7 @@ export function MaintenancePage({
             ['scheduled', 'pending', 'in_progress', 'rescheduled', 'overdue'].includes(schedule.status)
           ).length
         }
-        recordsCount={visibleRecords.length}
+        recordsCount={inboxRecords.length}
         onChange={setActiveTab}
       />
 
@@ -211,13 +220,13 @@ export function MaintenancePage({
             equipmentGroups={equipmentGroups}
             filters={filters}
             metrics={processMetrics}
-            records={visibleRecords}
+            records={inboxRecords}
             selectedRecordId={selectedRecord?.id ?? null}
             status={status}
             onChangeFilters={updateFilters}
             onChangeType={(maintenanceType) => {
               setActiveType(maintenanceType)
-              onChangeFilters({ ...filters, maintenanceType })
+              onChangeFilters(cleanMaintenanceFilters({ ...filters, maintenanceType }))
             }}
             onSelect={setSelectedRecordId}
           />
@@ -256,6 +265,7 @@ export function MaintenancePage({
             records={records}
             onCreateGroup={onCreateGroup}
             onDeleteGroup={onDeleteGroup}
+            onScheduleGroup={onScheduleGroup}
             onUpdateGroup={onUpdateGroup}
           />
       )}
@@ -483,6 +493,7 @@ function EquipmentGroupsPanel({
   records,
   onCreateGroup,
   onDeleteGroup,
+  onScheduleGroup,
   onUpdateGroup,
 }: {
   activeGroupId?: string
@@ -491,6 +502,7 @@ function EquipmentGroupsPanel({
   records: MaintenanceRecord[]
   onCreateGroup: (payload: EquipmentGroupPayload) => Promise<void>
   onDeleteGroup: (groupId: string) => Promise<void>
+  onScheduleGroup: (groupId: string) => void
   onUpdateGroup: (groupId: string, payload: EquipmentGroupPayload) => Promise<void>
 }) {
   const [form, setForm] = useState({ description: '', equipmentIds: [] as string[], name: '' })
@@ -673,44 +685,16 @@ function EquipmentGroupsPanel({
 
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           {visibleGroups.map((group) => (
-            <div
-              className={`rounded-md border p-4 ${
-                activeGroupId === group.id || editingGroupId === group.id
-                  ? 'border-cyan-700 bg-cyan-500/10'
-                  : 'border-slate-800 bg-slate-950'
-              }`}
+            <EquipmentGroupCard
+              active={activeGroupId === group.id || editingGroupId === group.id}
+              deleting={state === 'deleting'}
+              group={group}
               key={group.id}
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-slate-100">{group.name}</p>
-                  <p className="mt-1 text-xs text-slate-500">
-                    {group.equipment.map((item) => item.internalCode).join(', ') || 'Sin equipos'}
-                  </p>
-                </div>
-                <span className="shrink-0 rounded-full border border-slate-700 px-2 py-1 text-xs text-slate-300">
-                  {group.equipment.length}
-                </span>
-              </div>
-              <GroupProgress group={group} records={records} />
-              <div className="mt-4 flex flex-wrap gap-2">
-                <button
-                  className="rounded-md border border-slate-700 px-3 py-1.5 text-xs text-slate-200 transition hover:border-cyan-500"
-                  type="button"
-                  onClick={() => editGroup(group)}
-                >
-                  Editar
-                </button>
-                <button
-                  className="rounded-md border border-slate-700 px-3 py-1.5 text-xs text-slate-300 transition hover:border-red-500 hover:text-red-100 disabled:opacity-50"
-                  disabled={state === 'deleting'}
-                  type="button"
-                  onClick={() => deleteGroup(group.id)}
-                >
-                  Eliminar
-                </button>
-              </div>
-            </div>
+              records={records}
+              onDelete={() => deleteGroup(group.id)}
+              onEdit={() => editGroup(group)}
+              onScheduleNext={() => onScheduleGroup(group.id)}
+            />
           ))}
           {visibleGroups.length === 0 && (
             <p className="rounded-md border border-slate-800 bg-slate-950 px-4 py-8 text-center text-sm text-slate-500 md:col-span-2">
@@ -1009,17 +993,78 @@ function ProcessFact({ label, value }: { label: string; value: string }) {
   )
 }
 
-function GroupProgress({ group, records }: { group: EquipmentGroup; records: MaintenanceRecord[] }) {
-  const equipmentIds = new Set(group.equipment.map((item) => item.id))
-  const groupRecords = records.filter((record) => record.equipment?.id && equipmentIds.has(record.equipment.id))
-  const completedEquipment = new Set(
-    groupRecords
-      .filter((record) => record.status === 'completed')
-      .map((record) => record.equipment?.id)
-      .filter(Boolean)
+function EquipmentGroupCard({
+  active,
+  deleting,
+  group,
+  onDelete,
+  onEdit,
+  onScheduleNext,
+  records,
+}: {
+  active: boolean
+  deleting: boolean
+  group: EquipmentGroup
+  records: MaintenanceRecord[]
+  onDelete: () => void
+  onEdit: () => void
+  onScheduleNext: () => void
+}) {
+  const progress = groupProgress(group, records)
+  const canScheduleNext = progress.total > 0 && progress.percent === 100
+
+  return (
+    <div
+      className={`rounded-md border p-4 ${
+        active
+          ? 'border-cyan-700 bg-cyan-500/10'
+          : 'border-slate-800 bg-slate-950'
+      }`}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-slate-100">{group.name}</p>
+          <p className="mt-1 text-xs text-slate-500">
+            {group.equipment.map((item) => item.internalCode).join(', ') || 'Sin equipos'}
+          </p>
+        </div>
+        <span className="shrink-0 rounded-full border border-slate-700 px-2 py-1 text-xs text-slate-300">
+          {group.equipment.length}
+        </span>
+      </div>
+      <GroupProgress group={group} records={records} />
+      <div className="mt-4 flex flex-wrap gap-2">
+        {canScheduleNext && (
+          <button
+            className="rounded-md border border-cyan-700 px-3 py-1.5 text-xs font-medium text-cyan-100 transition hover:border-cyan-400"
+            type="button"
+            onClick={onScheduleNext}
+          >
+            Programar siguiente
+          </button>
+        )}
+        <button
+          className="rounded-md border border-slate-700 px-3 py-1.5 text-xs text-slate-200 transition hover:border-cyan-500"
+          type="button"
+          onClick={onEdit}
+        >
+          Editar
+        </button>
+        <button
+          className="rounded-md border border-slate-700 px-3 py-1.5 text-xs text-slate-300 transition hover:border-red-500 hover:text-red-100 disabled:opacity-50"
+          disabled={deleting}
+          type="button"
+          onClick={onDelete}
+        >
+          Eliminar
+        </button>
+      </div>
+    </div>
   )
-  const total = group.equipment.length
-  const percent = total > 0 ? Math.round((completedEquipment.size / total) * 100) : 0
+}
+
+function GroupProgress({ group, records }: { group: EquipmentGroup; records: MaintenanceRecord[] }) {
+  const { percent } = groupProgress(group, records)
 
   return (
     <div className="mt-3">
@@ -1564,6 +1609,71 @@ function ProgressLine({ compact = false, record }: { compact?: boolean; record: 
       )}
     </div>
   )
+}
+
+function groupProgress(group: EquipmentGroup, records: MaintenanceRecord[]) {
+  const equipmentIds = new Set(group.equipment.map((item) => item.id))
+  const groupRecords = records.filter((record) => record.equipment?.id && equipmentIds.has(record.equipment.id))
+  const currentGroupRecords = latestRecordByEquipment(groupRecords)
+  const completedEquipment = new Set(
+    currentGroupRecords
+      .filter((record) => record.status === 'completed')
+      .map((record) => record.equipment?.id)
+      .filter(Boolean)
+  )
+  const total = group.equipment.length
+  const percent = total > 0 ? Math.round((completedEquipment.size / total) * 100) : 0
+
+  return { percent, total }
+}
+
+function cleanMaintenanceFilters(filters: MaintenanceFilters): MaintenanceFilters {
+  return Object.fromEntries(
+    Object.entries(filters).filter(([, value]) => value !== undefined && value !== null && value !== '')
+  ) as MaintenanceFilters
+}
+
+function latestRecordByEquipment(records: MaintenanceRecord[]) {
+  const byEquipment = new Map<string, MaintenanceRecord>()
+
+  records.forEach((record) => {
+    const key = record.equipment?.id ?? record.id
+    const current = byEquipment.get(key)
+
+    if (!current || compareRecordPriority(record, current) > 0) {
+      byEquipment.set(key, record)
+    }
+  })
+
+  return records.filter((record) => byEquipment.get(record.equipment?.id ?? record.id)?.id === record.id)
+}
+
+function compareRecordPriority(candidate: MaintenanceRecord, current: MaintenanceRecord) {
+  const statusDifference = recordStatusPriority(candidate) - recordStatusPriority(current)
+
+  if (statusDifference !== 0) {
+    return statusDifference
+  }
+
+  return recordDateValue(candidate) - recordDateValue(current)
+}
+
+function recordStatusPriority(record: MaintenanceRecord) {
+  if (['pending', 'in_progress', 'scheduled', 'rescheduled', 'overdue'].includes(record.status)) {
+    return 2
+  }
+
+  if (record.status === 'completed') {
+    return 1
+  }
+
+  return 0
+}
+
+function recordDateValue(record: MaintenanceRecord) {
+  return new Date(
+    record.scheduledDate ?? record.closedAt ?? record.performedAt ?? record.receivedAt ?? ''
+  ).getTime() || 0
 }
 
 function getProcessMetrics(records: MaintenanceRecord[]): ProcessMetrics {

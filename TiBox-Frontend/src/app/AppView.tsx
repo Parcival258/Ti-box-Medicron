@@ -1,5 +1,6 @@
 import { AlertsPage, MyCasesPage } from '@/features/alerts'
 import { ChatPage } from '@/features/chat'
+import { InfoPage } from '@/features/info'
 import { InventoryPage } from '@/features/inventory'
 import { EquipmentLoansPage } from '@/features/loans'
 import { MaintenancePage } from '@/features/maintenance'
@@ -156,7 +157,14 @@ export function AppView({
           onCancel={(scheduleId) =>
             actions.handleScheduleAction(() => actions.cancelMaintenanceSchedule(scheduleId))
           }
-          onCreateSchedule={() => actions.setIsScheduleFormOpen(true)}
+          onCreateSchedule={() => {
+            actions.setScheduleFormGroupId(null)
+            actions.setIsScheduleFormOpen(true)
+          }}
+          onScheduleGroup={(groupId) => {
+            actions.setScheduleFormGroupId(groupId)
+            actions.setIsScheduleFormOpen(true)
+          }}
           onFinish={actions.handleFinishSchedule}
           onMarkPending={(scheduleId) =>
             actions.handleScheduleAction(() => actions.markMaintenancePending(scheduleId))
@@ -301,6 +309,8 @@ export function AppView({
           requestConfirmation={requestConfirmation}
         />
       )}
+
+      {state.activeView === 'info' && <InfoPage />}
     </div>
   )
 }
