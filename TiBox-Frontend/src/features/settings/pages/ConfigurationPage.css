@@ -1,0 +1,14 @@
+.settings-select {
+  min-width: 150px;
+  border: 1px solid #334155;
+  border-radius: 0.375rem;
+  background: #020617;
+  padding: 0.5rem 0.75rem;
+  color: #e2e8f0;
+  outline: none;
+}
+
+.settings-select:focus {
+  border-color: #06b6d4;
+}
+
