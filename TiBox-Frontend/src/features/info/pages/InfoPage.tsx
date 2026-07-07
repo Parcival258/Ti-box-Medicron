@@ -81,7 +81,7 @@ export function InfoPage() {
           <dl className="info-data-list">
             <div>
               <dt>Desarrollador</dt>
-              <dd>Parcival258</dd>
+              <dd>Andres Lasso</dd>
             </div>
             <div>
               <dt>Rol</dt>
